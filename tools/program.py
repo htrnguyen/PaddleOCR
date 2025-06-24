@@ -896,7 +896,17 @@ def preprocess(is_train=False):
     elif use_gcu:  # Use Enflame GCU(General Compute Unit)
         device = "gcu:{0}".format(os.getenv("FLAGS_selected_gcus", 0))
     else:
-        device = "gpu:{}".format(dist.ParallelEnv().device_id) if use_gpu else "cpu"
+        # 
+        if use_gpu:
+            import paddle
+            if paddle.is_compiled_with_cuda():
+                gpu_ids = paddle.device.cuda.device_count()
+                device = f"gpu:{paddle.device.cuda.current_device()}" if gpu_ids > 0 else "cpu"
+            else:
+                device = "cpu"
+        else:
+            device = "cpu"
+
     check_device(use_gpu, use_xpu, use_npu, use_mlu, use_gcu)
 
     device = paddle.set_device(device)
