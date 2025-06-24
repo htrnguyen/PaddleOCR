@@ -12,33 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
-import os
-import gc
-import sys
-import platform
-import yaml
-import time
-import datetime
-import paddle
-import paddle.distributed as dist
-from tqdm import tqdm
-import cv2
-import numpy as np
 import copy
+import datetime
+import gc
+import os
+import platform
+import sys
+import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from ppocr.utils.stats import TrainingStats
-from ppocr.utils.save_load import save_model
-from ppocr.utils.utility import print_dict, AverageMeter
-from ppocr.utils.logging import get_logger
-from ppocr.utils.loggers import WandbLogger, Loggers
-from ppocr.utils import profiler
+import cv2
+import numpy as np
+import paddle
+import paddle.distributed as dist
+import yaml
+from tqdm import tqdm
+
 from ppocr.data import build_dataloader
+from ppocr.utils import profiler
 from ppocr.utils.export_model import export
+from ppocr.utils.loggers import Loggers, WandbLogger
+from ppocr.utils.logging import get_logger
+from ppocr.utils.save_load import save_model
+from ppocr.utils.stats import TrainingStats
+from ppocr.utils.utility import AverageMeter, print_dict
 
 
 class ArgsParser(ArgumentParser):
@@ -897,7 +896,7 @@ def preprocess(is_train=False):
     elif use_gcu:  # Use Enflame GCU(General Compute Unit)
         device = "gcu:{0}".format(os.getenv("FLAGS_selected_gcus", 0))
     else:
-        device = "gpu:{}".format(dist.ParallelEnv().dev_id) if use_gpu else "cpu"
+        device = "gpu:{}".format(dist.ParallelEnv().device_id) if use_gpu else "cpu"
     check_device(use_gpu, use_xpu, use_npu, use_mlu, use_gcu)
 
     device = paddle.set_device(device)
