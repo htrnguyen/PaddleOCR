@@ -896,12 +896,12 @@ def preprocess(is_train=False):
     elif use_gcu:  # Use Enflame GCU(General Compute Unit)
         device = "gcu:{0}".format(os.getenv("FLAGS_selected_gcus", 0))
     else:
-        # 
+        #
         if use_gpu:
             import paddle
             if paddle.is_compiled_with_cuda():
                 gpu_ids = paddle.device.cuda.device_count()
-                device = f"gpu:{paddle.device.cuda.current_device()}" if gpu_ids > 0 else "cpu"
+                device = paddle.get_device() if gpu_ids > 0 else "cpu"
             else:
                 device = "cpu"
         else:
